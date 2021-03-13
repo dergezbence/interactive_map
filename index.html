@@ -3,7 +3,7 @@
 
 <head>
     <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
-    <script src="./index.js" defer></script>
+    <script src="dist/bundle.js" defer></script>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCEac9YWmH3ybVgORDEXW5cfs4PLKn_KkY&callback=initMap&libraries=&v=weekly" defer></script>
     
 
@@ -11,12 +11,36 @@
         .mapcontainer{
             margin: 20px;
             border: 1px solid grey;
+            overflow: hidden;
         }
 
         #map{
             width: 75%;
-            height: 800px;
+            height: 700px;
+            float: left;
         }
+
+        #mapLegend{
+            background-color: aliceblue;
+            margin: 10px;
+            padding: 10px;
+        }
+
+        #mapLegend img{
+            width: 30px;
+            height: auto;
+        }
+
+        #controls{
+            float: left;
+            margin-left: 20px;
+        }
+
+        #mapLegend img{
+         cursor: pointer;
+        }
+
+
     </style>
 
     
@@ -25,10 +49,12 @@
 <body>
     
 <div class="mapcontainer">
-    <div id="map">
-
+    <div id="map"></div>
+    <div id="mapLegend"></div>
+    <div id="controls">
+        <div><h3>Merill Creek Reservoir</h3></div>
     </div>
-<div>
+</div>
 
 
 </body>
