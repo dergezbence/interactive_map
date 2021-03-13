@@ -1,0 +1,41 @@
+.mapcontainer{
+    margin: 20px;
+    border: 1px solid grey;
+    overflow: hidden;
+}
+
+#map{
+    width: 70%;
+    height: 700px;
+    float: left;
+}
+
+#mapLegend{
+    background-color: aliceblue;
+    margin: 5px;
+    padding: 10px;
+}
+
+#mapLegend img{
+    width: 30px;
+    height: auto;
+}
+
+#controls{
+    float: left;
+    margin-left: 20px;
+}
+
+#controls:last-child {
+    margin-bottom: 20px;
+}
+
+#mapLegend img{
+ cursor: pointer;
+}
+
+@media only screen and (max-width: 920px) {
+    #map{
+        width: 100%;
+    }
+  }

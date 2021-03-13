@@ -9,7 +9,7 @@ class InteractiveMap {
     initMap = () => {
         this.map = new google.maps.Map(document.getElementById("map"), {
             zoom: 15,
-            center: { lat: 40.73663275920072, lng: -75.09917505322835 },
+            center: { lat: 40.73663275920072, lng: -75.10072000562093 },
             zoomControl: false,
             mapTypeControl: false,
             scaleControl: false,
