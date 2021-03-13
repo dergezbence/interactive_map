@@ -21,9 +21,8 @@
     height: auto;
 }
 
-#controls{
-    float: left;
-    margin-left: 20px;
+#right_panel{
+    margin-left: 71%;
 }
 
 #controls:last-child {
@@ -38,4 +37,8 @@
     #map{
         width: 100%;
     }
-  }
+
+    #right_panel{
+        margin-left: 1%;
+    }
+}

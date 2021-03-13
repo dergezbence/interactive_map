@@ -3,11 +3,27 @@ import { kml } from "@tmcw/togeojson";
 class InteractiveMap {
 
     constructor() {
+        this.rightPanel = document.getElementById('right_panel');
+        this.controls = document.getElementById('controls');
+        this.fullPaddleDescription = document.getElementById('full_paddle_description');
+        this.recommendedPaddleDescription = document.getElementById('recommended_paddle_description');
         window.initMap = this.initMap;
+        
+        this.rightPanel.removeChild(this.fullPaddleDescription); // initially the recommended paddle is checked
     }
 
     initMap = () => {
-        this.map = new google.maps.Map(document.getElementById("map"), {
+        this.map = this.createMap();
+        this.loadLayers();
+        this.renderLayers();
+        this.renderLayerSelectors();
+        this.loadLegend();
+        this.showLegend();
+        this.markers = [];
+    }
+
+    createMap = () => {
+        return new google.maps.Map(document.getElementById("map"), {
             zoom: 15,
             center: { lat: 40.73663275920072, lng: -75.10072000562093 },
             zoomControl: false,
@@ -18,11 +34,86 @@ class InteractiveMap {
             fullscreenControl: false,
             draggable: false
         });
-        this.loadLayers();
-        this.showLayers();
-        this.showLegends();
-        this.markers = [];
     }
+
+    loadLayers = () => {
+        this.layers = {
+            alt: new google.maps.KmlLayer('https://njpaddle.org/kmls/merill-creek-alt-paddle.kmz', {preserveViewport:true}),
+            full: new google.maps.KmlLayer('https://njpaddle.org/kmls/merill-creek-full-paddle.kmz', {preserveViewport:true}),
+        }
+    }
+
+    renderLayers = () => {
+        //this.layers.full.setMap(this.map);
+        this.layers.alt.setMap(this.map);
+    }
+
+    loadLegend = () => {
+        // to be able to reference the different markers in the legend layer, its loaded from a KML file
+        fetch("./doc.kml")
+        .then(function(response) {
+            return response.text();
+        })
+        .then((xml) => {
+            this.features = kml(new DOMParser().parseFromString(xml, "text/xml")).features;
+            this.renderLegends();
+        });
+    }
+
+    showLegend = () => {
+        var legend = document.getElementById('mapLegend');
+        this.map.controls[google.maps.ControlPosition.RIGHT_TOP].push(legend);
+    }
+
+    renderLayerSelectors = () => {
+        const fullCheckBox = document.createElement('input');
+        fullCheckBox.setAttribute('type', 'checkbox');
+        fullCheckBox.checked = false;
+        const fullLabel = document.createElement('label');
+        fullLabel.innerText = "Full lake paddle";
+        const fullSelectorDiv = document.createElement('div');
+        fullSelectorDiv.appendChild(fullCheckBox);
+        fullSelectorDiv.appendChild(fullLabel);
+
+        const altCheckBox = document.createElement('input');
+        altCheckBox.setAttribute('type', 'checkbox');
+        altCheckBox.checked = true;
+        const altLabel = document.createElement('label');
+        altLabel.innerText = "Recommended paddle";
+        const altSelectorDiv = document.createElement('div');
+        altSelectorDiv.appendChild(altCheckBox);
+        altSelectorDiv.appendChild(altLabel);
+
+        fullCheckBox.addEventListener('change', e => {
+            this.layers.full.setMap(e.target.checked ? this.map : null);
+
+            e.target.checked ? 
+            this.rightPanel.appendChild(this.fullPaddleDescription) : 
+            this.rightPanel.removeChild(this.fullPaddleDescription);
+
+            if(altCheckBox.checked === e.target.checked){
+                altCheckBox.checked = !e.target.checked;
+                altCheckBox.dispatchEvent(new Event('change'));
+            }
+        });
+
+        altCheckBox.addEventListener('change', e => {
+            this.layers.alt.setMap(e.target.checked ? this.map : null);
+
+            e.target.checked ? 
+            this.rightPanel.appendChild(this.recommendedPaddleDescription) : 
+            this.rightPanel.removeChild(this.recommendedPaddleDescription);
+           
+            if(fullCheckBox.checked === e.target.checked){
+                fullCheckBox.checked = !e.target.checked;
+                fullCheckBox.dispatchEvent(new Event('change'));
+            }
+        });
+        
+        
+        this.controls.appendChild(fullSelectorDiv);
+        this.controls.appendChild(altSelectorDiv);
+     }
 
     renderLegends = () => {
         let legendContainer = document.getElementById('mapLegend');
@@ -42,13 +133,6 @@ class InteractiveMap {
             
         });
         this.renderLegendSelector('Legends');
-    }
-
-    loadLayers = () => {
-        this.layers = {
-            alt: new google.maps.KmlLayer('https://njpaddle.org/kmls/merill-creek-alt-paddle.kmz', {preserveViewport:true}),
-            full: new google.maps.KmlLayer('https://njpaddle.org/kmls/merill-creek-full-paddle.kmz', {preserveViewport:true}),
-        }
     }
 
     createMarker = (feature, legend) => {
@@ -93,45 +177,8 @@ class InteractiveMap {
           this.markers.push(marker);
     }
 
-    showLayers = () => {
-        this.layers.full.setMap(this.map);
-        this.layers.alt.setMap(this.map);
-
-        this.renderLayerSelector(this.layers.full, "Full lake paddle");
-        this.renderLayerSelector(this.layers.alt, "Recommended paddle");
-
-        // to be able to reference the different markers in the legend layer, its loaded from a KML file
-        fetch("./doc.kml")
-        .then(function(response) {
-            return response.text();
-        })
-        .then((xml) => {
-            this.features = kml(new DOMParser().parseFromString(xml, "text/xml")).features;
-            this.renderLegends();
-        });
-    }
-
-    renderLayerSelector = (layer, name) => {
-       const checkBox = document.createElement('input');
-       checkBox.setAttribute('type', 'checkbox');
-       checkBox.checked = true;
-       checkBox.addEventListener('change', e => {
-            layer.setMap(e.target.checked ? this.map : null);
-       });
-
-       const label = document.createElement('label');
-       label.innerText = name;
-
-       const selectorDiv = document.createElement('div');
-       selectorDiv.appendChild(checkBox);
-       selectorDiv.appendChild(label);
-
-       const controls = document.getElementById('controls');
-       controls.appendChild(selectorDiv);
-    }
-
     renderLegendSelector = (name) => {
-        const checkBox = document.createElement('input');
+       const checkBox = document.createElement('input');
        checkBox.setAttribute('type', 'checkbox');
        checkBox.checked = true;
        checkBox.addEventListener('change', e => {
@@ -148,13 +195,7 @@ class InteractiveMap {
        selectorDiv.appendChild(checkBox);
        selectorDiv.appendChild(label);
 
-       const controls = document.getElementById('controls');
-       controls.appendChild(selectorDiv);
-    }
-
-    showLegends = () => {
-        var legend = document.getElementById('mapLegend');
-        this.map.controls[google.maps.ControlPosition.RIGHT_TOP].push(legend);
+       this.controls.appendChild(selectorDiv);
     }
 }
 
