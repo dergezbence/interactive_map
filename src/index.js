@@ -51,7 +51,7 @@ class InteractiveMap {
 
     loadLegend = () => {
         // to be able to reference the different markers in the legend layer, its loaded from a KML file
-        fetch("./kmz/doc.kml")
+        fetch("./kmz/legend.kml")
         .then(function(response) {
             return response.text();
         })
@@ -167,7 +167,7 @@ class InteractiveMap {
 
           marker.addListener("click", () => {
               infowindow.open(this.map, marker);
-              window.setTimeout(() => this.map.setCenter({ lat: 40.73663275920072, lng: -75.10072000562093 }), 200); 
+              //window.setTimeout(() => this.map.setCenter({ lat: 40.73663275920072, lng: -75.10072000562093 }), 200); 
           });
 
           if(legend){
