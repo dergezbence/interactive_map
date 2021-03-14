@@ -1,7 +1,8 @@
 import { kml } from "@tmcw/togeojson";
+import './map_style.css';
 
 class InteractiveMap {
-
+ 
     constructor() {
         this.rightPanel = document.getElementById('right_panel');
         this.controls = document.getElementById('controls');
@@ -50,7 +51,7 @@ class InteractiveMap {
 
     loadLegend = () => {
         // to be able to reference the different markers in the legend layer, its loaded from a KML file
-        fetch("./doc.kml")
+        fetch("./kmz/doc.kml")
         .then(function(response) {
             return response.text();
         })
@@ -164,7 +165,10 @@ class InteractiveMap {
             content: contentString,
           });
 
-          marker.addListener("click", () => infowindow.open(this.map, marker));
+          marker.addListener("click", () => {
+              infowindow.open(this.map, marker);
+              window.setTimeout(() => this.map.setCenter({ lat: 40.73663275920072, lng: -75.10072000562093 }), 200); 
+          });
 
           if(legend){
             legend.addEventListener("click", () => {
