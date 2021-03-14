@@ -27,20 +27,25 @@ class InteractiveMap {
         return new google.maps.Map(document.getElementById("map"), {
             zoom: 15,
             center: { lat: 40.73663275920072, lng: -75.10072000562093 },
-            zoomControl: false,
-            mapTypeControl: false,
+            zoomControl: true,
+            mapTypeControl: true,
             scaleControl: false,
             streetViewControl: false,
             rotateControl: false,
             fullscreenControl: false,
-            draggable: false
+            draggable: true
         });
     }
 
     loadLayers = () => {
         this.layers = {
-            alt: new google.maps.KmlLayer('https://njpaddle.org/kmls/merill-creek-alt-paddle.kmz', {preserveViewport:true}),
-            full: new google.maps.KmlLayer('https://njpaddle.org/kmls/merill-creek-full-paddle.kmz', {preserveViewport:true}),
+            alt: new google.maps.KmlLayer(
+                'https://njpaddle.org/kmls/merill-creek-alt-paddle.kmz', 
+                
+                {preserveViewport:true, suppressInfoWindows: true,}),
+            full: new google.maps.KmlLayer(
+                'https://njpaddle.org/kmls/merill-creek-full-paddle.kmz', 
+                {preserveViewport:true, suppressInfoWindows: true,}),
         }
     }
 
@@ -134,6 +139,15 @@ class InteractiveMap {
             
         });
         this.renderLegendSelector('Legends');
+
+        google.maps.event.addListener(this.map, 'click', (event) =>{
+            console.log("asd")
+            this.markers.forEach(marker => {
+                if(this.currentlyOpenInfoWindow){
+                    this.currentlyOpenInfoWindow.close();
+                }
+            })       
+        });
     }
 
     createMarker = (feature, legend) => {
@@ -166,6 +180,7 @@ class InteractiveMap {
           });
 
           marker.addListener("click", () => {
+              this.currentlyOpenInfoWindow = infowindow;
               infowindow.open(this.map, marker);
               //window.setTimeout(() => this.map.setCenter({ lat: 40.73663275920072, lng: -75.10072000562093 }), 200); 
           });
