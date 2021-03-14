@@ -58,6 +58,7 @@ class InteractiveMap {
                   suppressInfoWindows: true,
                 }
             );
+            layer.addListener("click", this.closeInfoWindowIfOpen);
             this.layerDatas.push({label: layerData.label, layer: layer, description: layerData.description});
         })
     }
@@ -127,10 +128,7 @@ class InteractiveMap {
         this.renderLegendSelector('Legends');
 
         // close marker info window on outer click
-        google.maps.event.addListener(this.map, 'click', () =>{
-                this.currentlyOpenInfoWindow && 
-                this.currentlyOpenInfoWindow.close();
-        });
+        google.maps.event.addListener(this.map, 'click', this.closeInfoWindowIfOpen);
     }
 
     createMarker = (feature, legend) => {
@@ -187,6 +185,8 @@ class InteractiveMap {
             this.markers.forEach(marker => marker.setMap(e.target.checked ? this.map : null))
        });
     }
+
+    closeInfoWindowIfOpen = () => this.currentlyOpenInfoWindow && this.currentlyOpenInfoWindow.close();
 }
 
 var im = new InteractiveMap();
